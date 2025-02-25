@@ -1,0 +1,21 @@
+# Use an existing image as a base, e.g., Ubuntu
+FROM ubuntu:20.04
+
+# Install necessary dependencies and Nix
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -L https://nixos.org/nix/install | sh
+
+# Set the environment variables for Nix
+ENV NIX_PATH=/nix/var/nix/profiles/per-user/root/channels
+ENV USER=root
+ENV NIX_CONF_DIR=/etc/nix
+ENV PATH=/root/.nix-profile/bin:$PATH
+
+# Install Nixpkgs and other dependencies if needed
+RUN nix-channel --add https://nixos.org/channels/nixos-21.05 nixpkgs && \
+    nix-channel --update && \
+    nix-env -iA nixpkgs.hello
+
+# Set working directory
+WORKDIR /workspace
